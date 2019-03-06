@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { BackgroundGeolocation, BackgroundGeolocationConfig, BackgroundGeolocationResponse, BackgroundGeolocationEvents } from '@ionic-native/background-geolocation/ngx';
 import { GoogleMaps,GoogleMap,GoogleMapsEvent,GoogleMapOptions,Marker,Environment} from '@ionic-native/google-maps';
 import * as firebase from 'firebase';
+import { Geolocation } from '@ionic-native/geolocation/ngx';
 
 @Component({
   selector: 'app-recorrido-mapa',
@@ -19,11 +20,19 @@ export class RecorridoMapaPage implements OnInit {
 
   locations: string[] = [];
   constructor(
+    private geolocation: Geolocation,
     private backgroundGeolocation: BackgroundGeolocation
   ) {
   }
 
   ngOnInit(){
+    this.geolocation.getCurrentPosition().then((resp) => {
+      this.latitud = resp.coords.latitude;
+      this.longitud = resp.coords.longitude;
+     }).catch((error) => {
+       console.log('Error getting location', error);
+     });
+     
     this.loadMap();
 
   }
@@ -65,6 +74,16 @@ export class RecorridoMapaPage implements OnInit {
         console.log(location);
         let insert = this.ref.push();
         insert.set(location)
+
+        this.map.addMarker({
+          title: 'Mi posición',
+          icon: 'red',
+          animation: 'DROP',
+          position: {
+            lat: location.latitude,
+            lng: location.longitude
+          }});
+        
       });
 
     this.backgroundGeolocation.start();
@@ -76,38 +95,42 @@ export class RecorridoMapaPage implements OnInit {
 
   loadMap() {
 
+    this.geolocation.getCurrentPosition().then((resp) => {
     // This code is necessary for browser
-    Environment.setEnv({
-      'API_KEY_FOR_BROWSER_RELEASE': 'https//www.google.com/maps/embeb/v1/MODE?key=AIzaSyDvnrn4179xHiXqCU_8c_ot4VeIJEcrNJ8&parameters',
-      'API_KEY_FOR_BROWSER_DEBUG': 'https//www.google.com/maps/embeb/v1/MODE?key=AIzaSyDvnrn4179xHiXqCU_8c_ot4VeIJEcrNJ8&parameters'
-    });
+      Environment.setEnv({
+        'API_KEY_FOR_BROWSER_RELEASE': 'https//www.google.com/maps/embeb/v1/MODE?key=AIzaSyDvnrn4179xHiXqCU_8c_ot4VeIJEcrNJ8&parameters',
+        'API_KEY_FOR_BROWSER_DEBUG': 'https//www.google.com/maps/embeb/v1/MODE?key=AIzaSyDvnrn4179xHiXqCU_8c_ot4VeIJEcrNJ8&parameters'
+      });
 
-    let mapOptions: GoogleMapOptions = {
-      camera: {
-         target: {
-           lat: this.latitud,
-           lng: this.longitud
-         },
-         zoom: 18,
-         tilt: 30
-       }
-    };
+      let mapOptions: GoogleMapOptions = {
+        camera: {
+            target: {
+            lat: resp.coords.latitude,
+            lng: resp.coords.longitude
+          },
+          zoom: 15,
+          tilt: 30
+        }
+      };
 
-    this.map = GoogleMaps.create('map_canvas', mapOptions);
+      this.map = GoogleMaps.create('map_canvas', mapOptions);
 
-    let marker: Marker = this.map.addMarkerSync({
-      title: 'Mi posición',
-      icon: 'green',
-      animation: 'DROP',
-      position: {
-        lat: this.latitud,
-        lng: this.longitud
-      }
-    });
+      let marker: Marker = this.map.addMarkerSync({
+        title: 'Mi posición',
+        icon: 'green',
+        animation: 'DROP',
+        position: {
+          lat: resp.coords.latitude,
+          lng: resp.coords.longitude
+        }
+      });
 
-    marker.on(GoogleMapsEvent.MARKER_CLICK).subscribe(() => {
+/*    marker.on(GoogleMapsEvent.MARKER_CLICK).subscribe(() => {
       alert('clicked');
-    });
-  }
+    });*/
+  }, error =>{
+    console.log("Hay un error: " + error);
+  });
+}
 
 }
