@@ -18,6 +18,10 @@ export class MirarRecorridoPage implements OnInit {
     this.loadMap();
   }
 
+  limpiarMapa(){
+    this.map.clear();
+  }
+
   loadMap() {
 
     // This code is necessary for browser

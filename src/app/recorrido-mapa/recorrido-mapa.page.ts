@@ -26,13 +26,6 @@ export class RecorridoMapaPage implements OnInit {
   }
 
   ngOnInit(){
-    this.geolocation.getCurrentPosition().then((resp) => {
-      this.latitud = resp.coords.latitude;
-      this.longitud = resp.coords.longitude;
-     }).catch((error) => {
-       console.log('Error getting location', error);
-     });
-     
     this.loadMap();
 
   }
@@ -49,6 +42,18 @@ export class RecorridoMapaPage implements OnInit {
   }
 
   iniciar(){
+
+    this.geolocation.getCurrentPosition().then((resp) => {
+      this.latitud = resp.coords.latitude;
+      this.longitud = resp.coords.longitude;
+      let insert = this.ref.push();
+      insert.set({
+        latitude: this.latitud,
+        longitude: this.longitud
+      })
+     }).catch((error) => {
+       console.log('Error getting location', error);
+     });
 
     const config: BackgroundGeolocationConfig = {
       desiredAccuracy: 10,
