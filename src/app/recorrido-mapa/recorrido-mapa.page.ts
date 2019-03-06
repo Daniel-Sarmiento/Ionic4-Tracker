@@ -3,6 +3,7 @@ import { BackgroundGeolocation, BackgroundGeolocationConfig, BackgroundGeolocati
 import { GoogleMaps,GoogleMap,GoogleMapsEvent,GoogleMapOptions,Marker,Environment} from '@ionic-native/google-maps';
 import * as firebase from 'firebase';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-recorrido-mapa',
@@ -20,6 +21,7 @@ export class RecorridoMapaPage implements OnInit {
 
   locations: string[] = [];
   constructor(
+    public alertController: AlertController,
     private geolocation: Geolocation,
     private backgroundGeolocation: BackgroundGeolocation
   ) {
@@ -27,18 +29,41 @@ export class RecorridoMapaPage implements OnInit {
 
   ngOnInit(){
     this.loadMap();
-
+    firebase.database().ref().on("child_added", function(snapshot){
+      console.log("Hola" + snapshot.val().latitude);
+    })
   }
 
-  iniciarBackGround(){
-    this.backgroundGeolocation.isLocationEnabled()
-    .then((rta) =>{
-      if(rta){
-        this.iniciar();
-      }else {
-        this.backgroundGeolocation.showLocationSettings();
-      }
-    })
+  async iniciarBackGround(){
+
+    const alert = await this.alertController.create({
+      header: '¡Confirmar!',
+      message: 'Esta apunto de inicializar un nuevo recorrido',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (blah) => {
+            console.log('Confirm Cancel: blah');
+          }
+        }, {
+          text: 'Iniciar',
+          handler: () => {
+            this.backgroundGeolocation.isLocationEnabled()
+            .then((rta) =>{
+              if(rta){
+                this.iniciar();
+              }else {
+                this.backgroundGeolocation.showLocationSettings();
+              }
+            })
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
   iniciar(){
