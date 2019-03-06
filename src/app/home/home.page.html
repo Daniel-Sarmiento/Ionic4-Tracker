@@ -7,7 +7,7 @@
 </ion-header>
 
 <ion-content padding>
-  <ion-item *ngFor="let location of locations">
-    {{ location }}
-  </ion-item>
+
+  <ion-button color="primary" (click)="hacerRecorrido()">Hacer recorrido</ion-button>
+  <ion-button color="success" (click)="mirarRecorrido()">Mirar recorrido</ion-button>
 </ion-content>
