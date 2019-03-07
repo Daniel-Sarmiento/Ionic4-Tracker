@@ -4,6 +4,7 @@ import { GoogleMaps,GoogleMap,GoogleMapsEvent,GoogleMapOptions,Marker,Environmen
 import * as firebase from 'firebase';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { AlertController } from '@ionic/angular';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-recorrido-mapa',
@@ -23,7 +24,8 @@ export class RecorridoMapaPage implements OnInit {
   constructor(
     public alertController: AlertController,
     private geolocation: Geolocation,
-    private backgroundGeolocation: BackgroundGeolocation
+    private backgroundGeolocation: BackgroundGeolocation,
+    public toastController: ToastController
   ) {
   }
 
@@ -54,6 +56,7 @@ export class RecorridoMapaPage implements OnInit {
             .then((rta) =>{
               if(rta){
                 this.iniciar();
+                this.presentToast();
               }else {
                 this.backgroundGeolocation.showLocationSettings();
               }
@@ -64,6 +67,22 @@ export class RecorridoMapaPage implements OnInit {
     });
 
     await alert.present();
+  }
+
+  async presentToast() {
+    const toast = await this.toastController.create({
+      message: 'Se inició el recorrido, porfavor empieza tu caminata.',
+      duration: 2500
+    });
+    toast.present();
+  }
+
+  async tostaParar() {
+    const toast = await this.toastController.create({
+      message: 'Terminaste tu reccorrido.',
+      duration: 2000
+    });
+    toast.present();
   }
 
   iniciar(){
@@ -135,6 +154,7 @@ export class RecorridoMapaPage implements OnInit {
           text: 'Parar',
           handler: () => {
             this.backgroundGeolocation.stop();
+            this.tostaParar();
           }
         }
       ]

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { GoogleMaps,GoogleMap,GoogleMapsEvent,GoogleMapOptions,Marker,Environment, MarkerCluster} from '@ionic-native/google-maps';
 import * as firebase from 'firebase';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-mirar-recorrido',
@@ -14,7 +15,7 @@ export class MirarRecorridoPage implements OnInit {
   latitud:number = 16.6147523;
   longitud:number = -93.0888514;
 
-  constructor(){
+  constructor(public toastController: ToastController){
     
   }
 
@@ -42,6 +43,7 @@ export class MirarRecorridoPage implements OnInit {
   limpiarMapa(){
     this.map.clear();
     firebase.database().ref().remove();
+    this.presentToast();
   }
 
   loadMap() {
@@ -63,5 +65,13 @@ export class MirarRecorridoPage implements OnInit {
        }
     };
     this.map = GoogleMaps.create('map_canvas', mapOptions);    
+  }
+
+  async presentToast() {
+    const toast = await this.toastController.create({
+      message: 'Se limpió el  mapa.',
+      duration: 2000
+    });
+    toast.present();
   }
 }
