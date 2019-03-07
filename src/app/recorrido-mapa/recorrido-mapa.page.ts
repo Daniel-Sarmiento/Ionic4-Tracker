@@ -119,8 +119,29 @@ export class RecorridoMapaPage implements OnInit {
     this.backgroundGeolocation.start();
   }
 
-  stopBackgroundGeolocation(){
-    this.backgroundGeolocation.stop();
+  async stopBackgroundGeolocation(){
+    const alert = await this.alertController.create({
+      header: '¡Confirmar!',
+      message: 'Esta apunto de terminar su recorrido',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (blah) => {
+            console.log('Confirm Cancel: blah');
+          }
+        }, {
+          text: 'Parar',
+          handler: () => {
+            this.backgroundGeolocation.stop();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+    
   }
 
   loadMap() {

@@ -10,22 +10,18 @@ import * as firebase from 'firebase';
 export class MirarRecorridoPage implements OnInit {
   map: GoogleMap;
   ref = firebase.database().ref()
-  markers:any[]
+
   latitud:number = 16.6147523;
   longitud:number = -93.0888514;
+
   constructor(){
-    //listar datos
-    this.ref.on('value', response => {
-      let datos = snapshotToArray(response);
-      this.markers = datos;
-      console.log(response);
-      console.log(datos);
-    });
+    
   }
 
-
   ngOnInit(){
+    
     this.loadMap();
+    
     firebase.database().ref().on("child_added", (snapshot) => {
       let nuevoRegistroFirebase = snapshot.val();
       console.log("nuevoRegistroFirebase.latitude" + nuevoRegistroFirebase.latitude);
@@ -41,14 +37,11 @@ export class MirarRecorridoPage implements OnInit {
         }
       });
     })
-    this.markers.forEach((value, index)=>{
-      console.log("Posicion: " + value.latitude)
-    })
   }
 
   limpiarMapa(){
     this.map.clear();
-
+    firebase.database().ref().remove();
   }
 
   loadMap() {
@@ -58,8 +51,6 @@ export class MirarRecorridoPage implements OnInit {
       'API_KEY_FOR_BROWSER_RELEASE': 'https//www.google.com/maps/embeb/v1/MODE?key=AIzaSyDvnrn4179xHiXqCU_8c_ot4VeIJEcrNJ8&parameters',
       'API_KEY_FOR_BROWSER_DEBUG': 'https//www.google.com/maps/embeb/v1/MODE?key=AIzaSyDvnrn4179xHiXqCU_8c_ot4VeIJEcrNJ8&parameters'
     });
-
-    
 
     let mapOptions: GoogleMapOptions = {
       camera: {
@@ -71,44 +62,6 @@ export class MirarRecorridoPage implements OnInit {
          tilt: 30
        }
     };
-
-    this.map = GoogleMaps.create('map_canvas', mapOptions);
-
-    let marker: Marker = this.map.addMarkerSync({
-      title: 'Mi posición',
-      icon: 'green',
-      animation: 'DROP',
-      position: {
-        lat: this.latitud,
-        lng: this.longitud
-      }
-    });
-
-    marker.on(GoogleMapsEvent.MARKER_CLICK).subscribe(() => {
-      alert('clicked');
-    });
-
-    
+    this.map = GoogleMaps.create('map_canvas', mapOptions);    
   }
-
-
-}
-
-export const snapshotToObject = snapshot => {
-  let item = snapshot.val();
-  item.key = snapshot.key;
-
-  return item;
-}
-
-export const snapshotToArray = sanpshot => {
-  let returnArr = [];
-
-  sanpshot.forEach(childSnapshot => {
-    let item = childSnapshot.val();
-    item.key = childSnapshot.key;
-    returnArr.push(item);
-  });
-
-  return returnArr;
 }
