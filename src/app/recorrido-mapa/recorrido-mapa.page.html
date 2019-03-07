@@ -1,11 +1,19 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Haz tu recorrido.</ion-title>
+    <ion-title>Haz tu recorrido</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content padding>
-    <ion-button color="warning" (click)="iniciarBackGround()">Iniciar</ion-button>
-    <ion-button color="danger"  (click)="stopBackgroundGeolocation()">Parar</ion-button>
+
+    <ion-button color="success" fill="outline" (click)="iniciarBackGround()">
+      <ion-icon slot="icon-only" name="play"></ion-icon>
+    </ion-button>
+
+    <ion-button color="danger" fill="outline" (click)="stopBackgroundGeolocation()">
+      <ion-icon slot="icon-only" name="square"></ion-icon>
+    </ion-button>
+
     <div style="height: 100%; width: 100%" id="map_canvas"></div>
+
 </ion-content>
